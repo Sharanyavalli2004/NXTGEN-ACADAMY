@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Parent Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+<div class="flex h-screen">
+  <aside class="w-64 bg-blue-900 text-white p-6">
+    <h2 class="text-2xl font-bold mb-6">Parent Panel</h2>
+    <nav class="space-y-2">
+      <a href="/parentdashboard" class="block px-4 py-2 bg-blue-700 rounded">Dashboard</a>
+      <a href="/parent-attendance" class="block px-4 py-2 hover:bg-blue-800 rounded">Attendance</a>
+      <a href="/parent-timetable" class="block px-4 py-2 hover:bg-blue-800 rounded">Timetable</a>
+      <a href="/parent-examinations" class="block px-4 py-2 hover:bg-blue-800 rounded">Examinations</a>
+    </nav>
+  </aside>
+  <main class="flex-1 p-8">
+    <h1 class="text-2xl font-semibold text-gray-800 mb-4">Welcome, Parent</h1>
+    <p>Select a section from the sidebar to view your child’s academic information.</p>
+  </main>
+</div>
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!-- home/studentlist.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Student List</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+  <div class="flex h-screen">
+    <aside class="w-64 bg-white shadow-md overflow-y-auto">
+      <div class="p-6 text-2xl font-bold text-indigo-600">Teacher Panel</div>
+      <nav class="mt-6">
+        <ul class="space-y-2 text-gray-700">
+          <li><a href="/teacher/dashboard" class="block px-6 py-2 hover:bg-indigo-100 rounded">Dashboard</a></li>
+          <li><a href="/teacher/profile" class="block px-6 py-2 hover:bg-indigo-100 rounded">Profile Setup</a></li>
+          <li><a href="/teacher/attendence" class="block px-6 py-2 bg-indigo-100 rounded font-semibold">Attendance</a></li>
+          <li><a href="/teacher/timetable" class="block px-6 py-2 hover:bg-indigo-100 rounded">Timetable</a></li>
+          <li><a href="/teacher/examinations" class="block px-6 py-2 hover:bg-indigo-100 rounded">Examinations</a></li>
+        </ul>
+      </nav>
+    </aside>
+
+    <main class="flex-1 p-8 overflow-y-auto">
+      <h2 class="text-2xl font-semibold text-gray-800 mb-4">Attendance List for: <span class="text-indigo-700">{{date}}</span></h2>
+
+      <table class="min-w-full bg-white border mt-4">
+        <thead>
+          <tr>
+            <th class="px-4 py-2 border">Student Name</th>
+            <th class="px-4 py-2 border">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- ✅ Dynamically load students from backend -->
+          <tr th:each="student : ${students}">
+            <td class="px-4 py-2 border" th:text="${student.name}">Student Name</td>
+            <td class="px-4 py-2 border">
+              <select class="border rounded px-2 py-1 w-full">
+                <option value="Present">Present</option>
+                <option value="Absent">Absent</option>
+                <option value="Leave">Leave</option>
+              </select>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </main>
+  </div>
+</body>
+</html>
