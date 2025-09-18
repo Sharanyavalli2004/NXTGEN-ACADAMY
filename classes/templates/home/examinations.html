@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Examinations</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+<div class="flex h-screen">
+  <!-- Sidebar -->
+  <aside class="w-64 bg-white shadow-md overflow-y-auto">
+    <div class="p-6 text-2xl font-bold text-indigo-600">Teacher Panel</div>
+    <nav class="mt-6">
+      <ul class="space-y-2 text-gray-700">
+        <li><a href="/teacher/dashboard" class="block px-6 py-2 hover:bg-indigo-100 rounded">Dashboard</a></li>
+        <li><a href="/teacher/profile" class="block px-6 py-2 hover:bg-indigo-100 rounded">Profile Setup</a></li>
+        <li><a href="/teacher/attendence" class="block px-6 py-2 hover:bg-indigo-100 rounded">Attendence</a></li>
+        <li><a href="/teacher/timetable" class="block px-6 py-2 hover:bg-indigo-100 rounded">Timetable</a></li>
+        <li><a href="/teacher/examinations" class="block px-6 py-2 bg-indigo-100 rounded font-semibold">Examinations</a></li>
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="flex-1 p-8 overflow-y-auto">
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-2xl font-semibold text-gray-800">Examinations</h2>
+      <button id="editBtn" onclick="toggleEdit()" class="bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-600">Edit</button>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="min-w-full bg-white border border-gray-300 mb-4" id="examTable">
+        <thead>
+          <tr class="bg-gray-200">
+            <th class="px-4 py-2 border">Exam Name</th>
+            <th class="px-4 py-2 border">Date</th>
+            <th class="px-4 py-2 border">Subject</th>
+            <th class="px-4 py-2 border">Time Duration</th>
+            <th class="px-4 py-2 border action-col">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Dynamic rows inserted here -->
+        </tbody>
+      </table>
+    </div>
+
+    <div class="flex items-center gap-4 edit-only" style="display: none;">
+      <button onclick="addRow()" class="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600">Add Exam</button>
+      <button onclick="saveExams()" class="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600">Save</button>
+    </div>
+  </main>
+</div>
+
+<script>
+  let isEditMode = false;
+
+  function toggleEdit() {
+    isEditMode = !isEditMode;
+    document.getElementById("editBtn").textContent = isEditMode ? "Cancel" : "Edit";
+
+    document.querySelectorAll(".edit-only").forEach(el => {
+      el.style.display = isEditMode ? "flex" : "none";
+    });
+
+    document.querySelectorAll(".action-col").forEach(col => {
+      col.style.display = isEditMode ? "table-cell" : "none";
+    });
+
+    if (isEditMode) {
+      fetch("/teacher/examinations/list")
+        .then(res => res.json())
+        .then(data => {
+          const tbody = document.querySelector("#examTable tbody");
+          tbody.innerHTML = "";
+          data.forEach(exam => {
+            tbody.innerHTML += `
+              <tr>
+                <td class="px-4 py-2 border"><input type="text" class="exam-name w-full px-2 py-1 border rounded" value="${exam.examName || ''}" /></td>
+                <td class="px-4 py-2 border"><input type="date" class="exam-date w-full px-2 py-1 border rounded" value="${exam.date || ''}" /></td>
+                <td class="px-4 py-2 border"><input type="text" class="exam-subject w-full px-2 py-1 border rounded" value="${exam.subject || ''}" /></td>
+                <td class="px-4 py-2 border">
+                  <div class="flex gap-2 items-center">
+                    <input type="time" class="start-time px-2 py-1 border rounded" value="${exam.startTime || ''}" />
+                    <span>-</span>
+                    <input type="time" class="end-time px-2 py-1 border rounded" value="${exam.endTime || ''}" />
+                  </div>
+                </td>
+                <td class="px-4 py-2 border text-center action-col">
+                  <button onclick="removeRow(this)" class="bg-red-500 text-white px-3 py-1 rounded">Delete</button>
+                </td>
+              </tr>`;
+          });
+        });
+    } else {
+      const rows = document.querySelectorAll("#examTable tbody tr");
+      rows.forEach(row => {
+        const examName = row.querySelector(".exam-name").value;
+        const date = row.querySelector(".exam-date").value;
+        const subject = row.querySelector(".exam-subject").value;
+        const start = row.querySelector(".start-time").value;
+        const end = row.querySelector(".end-time").value;
+
+        row.innerHTML = `
+          <td class="px-4 py-2 border">${examName}</td>
+          <td class="px-4 py-2 border">${date}</td>
+          <td class="px-4 py-2 border">${subject}</td>
+          <td class="px-4 py-2 border">${start} - ${end}</td>
+          <td class="px-4 py-2 border action-col" style="display: none;"></td>
+        `;
+      });
+    }
+  }
+
+  function addRow() {
+    const table = document.querySelector("#examTable tbody");
+    const row = `
+      <tr>
+        <td class="px-4 py-2 border"><input type="text" class="exam-name w-full px-2 py-1 border rounded" /></td>
+        <td class="px-4 py-2 border"><input type="date" class="exam-date w-full px-2 py-1 border rounded" /></td>
+        <td class="px-4 py-2 border"><input type="text" class="exam-subject w-full px-2 py-1 border rounded" /></td>
+        <td class="px-4 py-2 border">
+          <div class="flex gap-2 items-center">
+            <input type="time" class="start-time px-2 py-1 border rounded" />
+            <span>-</span>
+            <input type="time" class="end-time px-2 py-1 border rounded" />
+          </div>
+        </td>
+        <td class="px-4 py-2 border text-center action-col">
+          <button onclick="removeRow(this)" class="bg-red-500 text-white px-3 py-1 rounded">Delete</button>
+        </td>
+      </tr>`;
+    table.insertAdjacentHTML("beforeend", row);
+  }
+
+  function removeRow(button) {
+    button.closest("tr").remove();
+  }
+
+  function saveExams() {
+    const rows = document.querySelectorAll("#examTable tbody tr");
+    const exams = [];
+
+    rows.forEach(row => {
+      const examName = row.querySelector(".exam-name")?.value;
+      const date = row.querySelector(".exam-date")?.value;
+      const subject = row.querySelector(".exam-subject")?.value;
+      const start = row.querySelector(".start-time")?.value;
+      const end = row.querySelector(".end-time")?.value;
+
+      if (examName && date && subject && start && end) {
+        exams.push({ examName, date, subject, startTime: start, endTime: end });
+      }
+    });
+
+    fetch("/teacher/examinations/save", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(exams)
+    })
+    .then(res => res.text())
+    .then(msg => {
+      alert(msg);
+      toggleEdit(); // Switch to view mode
+    })
+    .catch(err => {
+      console.error("Error saving exams:", err);
+      alert("Failed to save.");
+    });
+  }
+
+  window.onload = () => {
+    toggleEdit(); toggleEdit(); // Load exams on page load and enter view mode
+  };
+</script>
+</body>
+</html>

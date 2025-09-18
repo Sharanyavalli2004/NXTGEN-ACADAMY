@@ -1,0 +1,14 @@
+com\example\demo\DemoApplication.class
+com\example\demo\com\example\demo\Student\StudentController.class
+com\example\demo\com\example\demo\Registration\RegistrationService.class
+com\example\demo\com\example\demo\Teacher\TeacherConfig.class
+com\example\demo\com\example\demo\Registration\RegistrationController.class
+com\example\demo\com\example\demo\Teacher\TeacherController.class
+com\example\demo\com\example\demo\Teacher\TeacherRepository.class
+com\example\demo\com\example\demo\Registration\RegistrationRepository.class
+com\example\demo\com\example\demo\Student\Student.class
+com\example\demo\com\example\demo\Teacher\Teacher.class
+com\example\demo\com\example\demo\Student\StudentService.class
+com\example\demo\com\example\demo\Teacher\TeacherService.class
+com\example\demo\com\example\demo\Student\StudentRepository.class
+com\example\demo\com\example\demo\Student\StudentConfig.class

@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .dropdown-content { display: none; }
+    .dropdown.open .dropdown-content { display: block; }
+  </style>
+</head>
+<body class="bg-gray-100 font-sans">
+<div class="flex h-screen">
+  <!-- Sidebar -->
+  <aside class="w-64 bg-blue-900 text-white p-6">
+    <h2 class="text-2xl font-bold mb-6">Admin Panel</h2>
+    <nav class="space-y-2">
+      <div class="dropdown">
+        <button onclick="toggleDropdown()" class="block px-4 py-2 bg-blue-700 rounded w-full text-left">Student List</button>
+        <div class="dropdown-content pl-4 mt-2">
+          <a href="#" onclick="showSection('seca')" class="block px-2 py-1 hover:bg-blue-800 rounded">SECA</a>
+          <a href="#" onclick="showSection('secb')" class="block px-2 py-1 hover:bg-blue-800 rounded">SECB</a>
+        </div>
+      </div>
+      <a href="#" onclick="showSection('teacherList')" class="block px-4 py-2 hover:bg-blue-800 rounded">Teacher List</a>
+      <a href="/studentdashboard" class="block px-4 py-2 hover:bg-blue-800 rounded">Student Dashboard</a>
+      <a href="/teacher/dashboard" class="block px-4 py-2 hover:bg-blue-800 rounded">Teacher Dashboard</a>
+      <a href="/parentdashboard" class="block px-4 py-2 hover:bg-blue-800 rounded">Parent Dashboard</a>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="flex-1 p-8 overflow-y-auto">
+    <!-- Sections: SECA, SECB, TeacherList -->
+    <div id="seca" class="hidden">
+      <h2 class="text-xl font-semibold mb-4">SECA Students</h2>
+      <div class="overflow-x-auto">
+        <table id="secaTable" class="min-w-full bg-white border">
+          <thead class="bg-blue-100">
+            <tr>
+              <th class="px-4 py-2 border">S.No</th>
+              <th class="px-4 py-2 border">Student Name</th>
+              <th class="px-4 py-2 border">Email</th>
+              <th class="px-4 py-2 border action-col hidden">Action</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+        <div class="mt-4 flex gap-2">
+          <button onclick="addRow('secaTable')" id="addRow-secaTable" class="bg-green-600 text-white px-4 py-2 rounded hidden">Add Row</button>
+          <button onclick="saveRows('secaTable')" id="save-secaTable" class="bg-blue-600 text-white px-4 py-2 rounded hidden">Save</button>
+          <button onclick="enableEdit('secaTable')" id="edit-secaTable" class="bg-yellow-500 text-white px-4 py-2 rounded">Edit</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="secb" class="hidden">
+      <h2 class="text-xl font-semibold mb-4">SECB Students</h2>
+      <div class="overflow-x-auto">
+        <table id="secbTable" class="min-w-full bg-white border">
+          <thead class="bg-blue-100">
+            <tr>
+              <th class="px-4 py-2 border">S.No</th>
+              <th class="px-4 py-2 border">Student Name</th>
+              <th class="px-4 py-2 border">Email</th>
+              <th class="px-4 py-2 border action-col hidden">Action</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+        <div class="mt-4 flex gap-2">
+          <button onclick="addRow('secbTable')" id="addRow-secbTable" class="bg-green-600 text-white px-4 py-2 rounded hidden">Add Row</button>
+          <button onclick="saveRows('secbTable')" id="save-secbTable" class="bg-blue-600 text-white px-4 py-2 rounded hidden">Save</button>
+          <button onclick="enableEdit('secbTable')" id="edit-secbTable" class="bg-yellow-500 text-white px-4 py-2 rounded">Edit</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="teacherList" class="hidden">
+      <h2 class="text-xl font-semibold mb-4">Teacher List</h2>
+      <div class="overflow-x-auto">
+        <table id="teacherTable" class="min-w-full bg-white border">
+          <thead class="bg-blue-100">
+            <tr>
+              <th class="px-4 py-2 border">S.No</th>
+              <th class="px-4 py-2 border">Teacher Name</th>
+              <th class="px-4 py-2 border">Email</th>
+              <th class="px-4 py-2 border">Teaching Subject</th>
+              <th class="px-4 py-2 border action-col hidden">Action</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+        <div class="mt-4 flex gap-2">
+          <button onclick="addRow('teacherTable')" id="addRow-teacherTable" class="bg-green-600 text-white px-4 py-2 rounded hidden">Add Row</button>
+          <button onclick="saveRows('teacherTable')" id="save-teacherTable" class="bg-blue-600 text-white px-4 py-2 rounded hidden">Save</button>
+          <button onclick="enableEdit('teacherTable')" id="edit-teacherTable" class="bg-yellow-500 text-white px-4 py-2 rounded">Edit</button>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+  function toggleDropdown() {
+    document.querySelector('.dropdown').classList.toggle('open');
+  }
+
+  function showSection(id) {
+    ['seca', 'secb', 'teacherList'].forEach(sec => {
+      document.getElementById(sec).style.display = 'none';
+    });
+    document.getElementById(id).style.display = 'block';
+    loadTableData(id);
+  }
+
+  function loadTableData(id) {
+    let url = '';
+    if (id === 'seca') url = '/admin/getStudents?section=SECA';
+    else if (id === 'secb') url = '/admin/getStudents?section=SECB';
+    else if (id === 'teacherList') url = '/admin/getTeachers';
+
+    const tableId = id === 'teacherList' ? 'teacherTable' : `${id}Table`;
+    const tbody = document.querySelector(`#${tableId} tbody`);
+    tbody.innerHTML = '';
+
+    fetch(url)
+      .then(res => res.json())
+      .then(data => {
+        data.forEach((item, index) => {
+          const row = document.createElement('tr');
+          row.setAttribute('data-id', item.id); // ⚠️ Add the ID to <tr>
+
+          if (tableId === 'teacherTable') {
+            row.innerHTML = `
+              <td class="border px-4 py-2">${index + 1}</td>
+              <td class="border px-4 py-2">${item.name}</td>
+              <td class="border px-4 py-2">${item.email}</td>
+              <td class="border px-4 py-2">${item.subject}</td>
+              <td class="border px-4 py-2 hidden action-col text-center">
+                <button onclick="deleteRow(this)" class="text-red-600 font-semibold">Delete</button>
+              </td>`;
+          } else {
+            row.innerHTML = `
+              <td class="border px-4 py-2">${index + 1}</td>
+              <td class="border px-4 py-2">${item.name}</td>
+              <td class="border px-4 py-2">${item.email}</td>
+              <td class="border px-4 py-2 hidden action-col text-center">
+                <button onclick="deleteRow(this)" class="text-red-600 font-semibold">Delete</button>
+              </td>`;
+          }
+
+          tbody.appendChild(row);
+        });
+      })
+      .catch(error => console.error('Error loading data:', error));
+  }
+
+  function enableEdit(tableId) {
+    document.getElementById(`addRow-${tableId}`).classList.remove('hidden');
+    document.getElementById(`save-${tableId}`).classList.remove('hidden');
+    document.getElementById(`edit-${tableId}`).classList.add('hidden');
+    document.querySelectorAll(`#${tableId} .action-col`).forEach(el => el.classList.remove('hidden'));
+  }
+
+  function addRow(tableId) {
+    const tableBody = document.querySelector(`#${tableId} tbody`);
+    const rowCount = tableBody.rows.length + 1;
+    const row = document.createElement('tr');
+    let cells = '';
+
+    if (tableId === 'teacherTable') {
+      cells = `
+        <td class="border px-4 py-2">${rowCount}</td>
+        <td class="border px-4 py-2"><input type="text" class="w-full" placeholder="Teacher Name" /></td>
+        <td class="border px-4 py-2"><input type="text" class="w-full" placeholder="Email" /></td>
+        <td class="border px-4 py-2"><input type="text" class="w-full" placeholder="Subject" /></td>
+        <td class="border px-4 py-2 text-center action-col">
+          <button onclick="deleteRow(this)" class="text-red-600 font-semibold">Delete</button>
+        </td>`;
+    } else {
+      cells = `
+        <td class="border px-4 py-2">${rowCount}</td>
+        <td class="border px-4 py-2"><input type="text" class="w-full" placeholder="Name" /></td>
+        <td class="border px-4 py-2"><input type="text" class="w-full" placeholder="Email" /></td>
+        <td class="border px-4 py-2 text-center action-col">
+          <button onclick="deleteRow(this)" class="text-red-600 font-semibold">Delete</button>
+        </td>`;
+    }
+
+    row.innerHTML = cells;
+    tableBody.appendChild(row);
+  }
+
+  function deleteRow(button) {
+    const row = button.closest('tr');
+    const table = row.closest('table');
+    const tableId = table.id;
+    const id = row.getAttribute('data-id');
+
+    if (id) {
+      const section = tableId === 'secaTable' ? 'SECA' : tableId === 'secbTable' ? 'SECB' : null;
+      const url = tableId === 'teacherTable'
+        ? `/admin/deleteTeacher?id=${id}`
+        : `/admin/deleteStudent?section=${section}&id=${id}`;
+
+      fetch(url, { method: 'DELETE' })
+        .then(res => res.text())
+        .then(msg => {
+          console.log(msg);
+          row.remove();
+          const rows = table.querySelectorAll('tbody tr');
+          rows.forEach((r, i) => r.children[0].innerText = i + 1);
+        })
+        .catch(err => {
+          console.error('Delete error:', err);
+          alert("Failed to delete from database.");
+        });
+    } else {
+      row.remove(); // Just a new row not saved yet
+      const rows = table.querySelectorAll('tbody tr');
+      rows.forEach((r, i) => r.children[0].innerText = i + 1);
+    }
+  }
+
+  function saveRows(tableId) {
+    const table = document.querySelector(`#${tableId} tbody`);
+    const data = Array.from(table.rows).map(row => {
+      const inputs = row.querySelectorAll('input');
+      if (inputs.length === 0) return null;
+
+      if (tableId === 'teacherTable') {
+        // 🧑‍🏫 Teacher row
+        return {
+          name: inputs[0]?.value,
+          email: inputs[1]?.value,
+          subject: inputs[2]?.value
+        };
+      } else {
+        // 👩‍🎓 Student row (SECA or SECB)
+        return {
+          name: inputs[0]?.value,
+          email: inputs[1]?.value, // ✅ Use email instead of rollNo
+          section: tableId === 'secaTable' ? 'SECA' : 'SECB'
+        };
+      }
+    }).filter(Boolean);
+
+    const endpoint = tableId === 'teacherTable'
+      ? '/admin/saveTeachers'
+      : `/admin/saveStudents?section=${tableId === 'secaTable' ? 'SECA' : 'SECB'}`;
+
+    fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    })
+    .then(res => res.text())
+    .then(msg => {
+      alert(msg);
+      document.getElementById(`addRow-${tableId}`).classList.add('hidden');
+      document.getElementById(`save-${tableId}`).classList.add('hidden');
+      document.getElementById(`edit-${tableId}`).classList.remove('hidden');
+      document.querySelectorAll(`#${tableId} .action-col`).forEach(el => el.classList.add('hidden'));
+      loadTableData(tableId === 'teacherTable' ? 'teacherList' : tableId === 'secaTable' ? 'seca' : 'secb');
+    })
+    .catch(error => {
+      console.error('Error saving data:', error);
+      alert('Failed to save data.');
+    });
+  }
+
+</script>
+
+</body>
+</html>   
